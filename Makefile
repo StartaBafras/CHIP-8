@@ -2,7 +2,7 @@ CC = gcc
 CFLAGS = -Wall -Wextra 
 LIBS = -lm -lX11
 
-all: main 
+all: chip8 
 
 
 gfx.o: gfx.c
@@ -12,9 +12,12 @@ gfx.o: gfx.c
 chip8.o: chip8.c
 	$(CC) $(CFLAGS) $(LIBS) -g -c chip8.c
 
+main.o: main.c
+	$(CC) $(CFLAGS) $(LIBS) -g -c main.c
 
-main: gfx.o chip8.o
-	$(CC) $(CFLAGS) $(LIBS) -g -o chip8 gfx.o chip8.o main.c
+
+chip8: gfx.o chip8.o main.o
+	$(CC) $(CFLAGS) $(LIBS) -g -o chip8 gfx.o chip8.o main.o
 
 
 
