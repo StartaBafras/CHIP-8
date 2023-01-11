@@ -21,7 +21,7 @@ chip8* chip8_init();
 
 int fetch(chip8 *emulator);
 
-int decode_execute(chip8 *emulator);
+void decode_execute(chip8 *emulator);
 
 int read_rom(chip8 *emulator);
 
