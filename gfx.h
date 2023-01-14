@@ -46,4 +46,7 @@ int gfx_event_waiting();
 /* Flush all previous output to the window. */
 void gfx_flush();
 
+/*Return pixel value in 24 bits */
+int get_pixel(int x,int y);
+
 #endif

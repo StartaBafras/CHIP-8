@@ -28,6 +28,8 @@ static GC      gfx_gc;
 static Colormap gfx_colormap;
 static int      gfx_fast_color_mode = 0;
 
+static XImage *gfx_image; // For get pixel value
+
 /* These values are saved by gfx_wait then retrieved later by gfx_xpos and gfx_ypos. */
 
 static int saved_xpos = 0;
@@ -232,4 +234,12 @@ int gfx_xsize()
 int gfx_ysize()
 {
 	return saved_ysize;
+}
+
+
+/*Return pixel value in 24 bits */
+int get_pixel(int x,int y)
+{
+	gfx_image = XGetImage(gfx_display,gfx_window,x,y,1,1,AllPlanes,XYPixmap);
+    return XGetPixel(gfx_image,0,0);
 }
