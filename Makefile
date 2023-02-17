@@ -18,6 +18,7 @@ main.o: main.c
 
 chip8: gfx.o chip8.o main.o
 	$(CC) $(CFLAGS) $(LIBS) -g -o chip8 gfx.o chip8.o main.o
+	rm -f test *.o
 
 
 
