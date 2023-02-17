@@ -4,7 +4,7 @@
 #define REGISTERS 16
 #define SCREEN_X 64
 #define SCREEN_Y 32
-
+#define PIXEL_SHIFTING 150
 
 typedef struct chip8
 {
