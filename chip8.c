@@ -116,14 +116,20 @@ void decode_execute(chip8 *emulator)
 						if(emulator->screen[y][x] == 1)
 						{
 							gfx_color(0,0,0);
-							gfx_point(x+150,y+150);
+							gfx_point((x+PIXEL_SHIFTING) + x*2,(y+PIXEL_SHIFTING) + y*2);
+							gfx_point((x+PIXEL_SHIFTING+1) + x*2,(y+PIXEL_SHIFTING) + y*2); // Nearest-neighbor interpolation
+							gfx_point((x+PIXEL_SHIFTING) + x*2,(y+PIXEL_SHIFTING+1) + y*2);
+							gfx_point((x+PIXEL_SHIFTING+1) + x*2,(y+PIXEL_SHIFTING+1) + y*2);
 							emulator->gpr[0xF] = 1;
 							emulator->screen[y][x] = 0;
 						}
 						else
 						{
 							gfx_color(255,255,255);
-							gfx_point(x+150,y+150);
+							gfx_point((x+PIXEL_SHIFTING) + x*2,(y+PIXEL_SHIFTING) + y*2);
+							gfx_point((x+PIXEL_SHIFTING+1) + x*2,(y+PIXEL_SHIFTING) + y*2); // Nearest-neighbor interpolation
+							gfx_point((x+PIXEL_SHIFTING) + x*2,(y+PIXEL_SHIFTING+1) + y*2);
+							gfx_point((x+PIXEL_SHIFTING+1) + x*2,(y+PIXEL_SHIFTING+1) + y*2);
 							emulator->screen[y][x] = 1;
 						}
 
