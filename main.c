@@ -1,5 +1,7 @@
 #include "gfx.h"
 #include "chip8.h"
+#include<time.h>
+#include <unistd.h>
 
 
 int main()
@@ -7,6 +9,7 @@ int main()
     
 	int ysize = 600;
 	int xsize = 600;
+    clock_t start, stop;
 
 
 	// Open a new window for drawing.
@@ -27,9 +30,12 @@ int main()
 
     for(;;)
     {
+        start = clock();
         fetch(emulator);
         decode_execute(emulator);
         gfx_flush();
+        stop = clock();
+        sleep( (16-(start-stop))/1000); //62.5 Hz
 
     }
 
