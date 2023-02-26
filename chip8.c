@@ -71,6 +71,26 @@ int fetch(chip8 *emulator)
 	return 0;
 }
 
+int Nearest_neighbor_interpolation(int zoom_rate,int x,int y) // Nearest-neighbor interpolation
+{
+	for(int i=0; i < zoom_rate; i++)
+	{
+		for(int j=0;  j < zoom_rate; j++)
+		{
+			gfx_point((x*zoom_rate) -(zoom_rate-1) +PIXEL_SHIFTING + i, (y*zoom_rate) -(zoom_rate-1) +PIXEL_SHIFTING + j);
+		}
+	}
+
+	// x2 zoom example
+	/*
+		gfx_point((x*2)-1+PIXEL_SHIFTING,  (y*2)-1+PIXEL_SHIFTING);
+		gfx_point((x*2)-1+PIXEL_SHIFTING+1,(y*2)-1+PIXEL_SHIFTING);
+		gfx_point((x*2)-1+PIXEL_SHIFTING, (y*2)-1+PIXEL_SHIFTING+1);
+		gfx_point((x*2)-1+PIXEL_SHIFTING +1, (y*2)-1+PIXEL_SHIFTING+1);
+	*/
+
+	return 0;
+}
 
 void decode_execute(chip8 *emulator)
 {
@@ -116,26 +136,21 @@ void decode_execute(chip8 *emulator)
 						if(emulator->screen[y][x] == 1)
 						{
 							gfx_color(0,0,0);
-							gfx_point((x*2)-1+PIXEL_SHIFTING,  (y*2)-1+PIXEL_SHIFTING);
-							gfx_point((x*2)-1+PIXEL_SHIFTING+1,(y*2)-1+PIXEL_SHIFTING); // Nearest-neighbor interpolation
-							gfx_point((x*2)-1+PIXEL_SHIFTING, (y*2)-1+PIXEL_SHIFTING+1);
-							gfx_point((x*2)-1+PIXEL_SHIFTING +1, (y*2)-1+PIXEL_SHIFTING+1);
+							Nearest_neighbor_interpolation(ZOOM_RATE,x,y);
 							emulator->gpr[0xF] = 1;
 							emulator->screen[y][x] = 0;
 						}
 						else
 						{
 							gfx_color(255,255,255);
-							gfx_point((x*2)-1+PIXEL_SHIFTING,  (y*2)-1+PIXEL_SHIFTING);
-							gfx_point((x*2)-1+PIXEL_SHIFTING+1,(y*2)-1+PIXEL_SHIFTING); // Nearest-neighbor interpolation
-							gfx_point((x*2)-1+PIXEL_SHIFTING, (y*2)-1+PIXEL_SHIFTING+1);
-							gfx_point((x*2)-1+PIXEL_SHIFTING +1, (y*2)-1+PIXEL_SHIFTING+1);
+							Nearest_neighbor_interpolation(ZOOM_RATE,x,y);
 							emulator->screen[y][x] = 1;
 						}
 
 					}
 					x++;
 				}
+
 				x = (emulator->gpr[(emulator->opcode & 0x0F00) >> 8 ])%64;
 				y++;
 				sprite = emulator->ram[emulator->I++];
@@ -145,8 +160,23 @@ void decode_execute(chip8 *emulator)
 			break;
 
 		default:
-		break;
+			break;
+		
 	}
 
 }
 
+short int pop(stack *stack_value)
+{
+    short int value = stack_value->stack[stack_value->stack_level];
+    stack_value->stack[stack_value->stack_level] = 0;
+    stack_value->stack_level--;
+    return value;
+}
+
+short int push(stack *stack_value, short int value)
+{
+    stack_value->stack_level++;
+    stack_value->stack[stack_value->stack_level] = value;
+    return 0;
+}
