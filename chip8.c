@@ -124,14 +124,14 @@ void decode_execute(chip8 *emulator)
 		break;
 
 	case 0x3000: // 3XNN x ve NN eşitse 1 komut atla
-		if(emulator->gpr[(emulator->opcode & 0x0F00) >> 8] == emulator->ram[emulator->opcode & 0x00FF])
+		if(emulator->gpr[(emulator->opcode & 0x0F00) >> 8] == (emulator->opcode & 0x00FF))
 		{
 			emulator->PC += 2;
 		}
 		break;
 
 	case 0x4000: // 4XNN x ve NN eşit değilse 1 komut atla
-		if(emulator->gpr[(emulator->opcode & 0x0F00) >> 8] != emulator->ram[emulator->opcode & 0x00FF])
+		if(emulator->gpr[(emulator->opcode & 0x0F00) >> 8] != (emulator->opcode & 0x00FF))
 		{
 			emulator->PC += 2;
 		}
