@@ -52,7 +52,7 @@ chip8 *chip8_init()
 
 int read_rom(chip8 *emulator)
 {
-	FILE *file = fopen("test_opcode.ch8", "r");
+	FILE *file = fopen("Zero Demo [zeroZshadow, 2007].ch8", "r");
 
 	while (!feof(file))
 	{
@@ -272,7 +272,7 @@ void decode_execute(chip8 *emulator)
 		}
 
 		break;
-		
+
 	case 0xE000:
 		switch (emulator->opcode & 0x00FF)
 		{
@@ -280,7 +280,7 @@ void decode_execute(chip8 *emulator)
 				if(gfx_event_waiting())
 				{
 					char c = convert_key(gfx_wait());
-					if(c == emulator->gpr[emulator->opcode & 0x00FF >> 8])
+					if(c == emulator->gpr[(emulator->opcode & 0x0F00) >> 8])
 					{
 						emulator->PC += 4;
 					}
@@ -291,7 +291,7 @@ void decode_execute(chip8 *emulator)
 				if(gfx_event_waiting())
 				{
 					char c = convert_key(gfx_wait());
-					if(c != emulator->gpr[emulator->opcode & 0x00FF >> 8])
+					if(c != emulator->gpr[(emulator->opcode & 0x0F00) >> 8])
 					{
 						emulator->PC += 4;
 					}
@@ -301,6 +301,67 @@ void decode_execute(chip8 *emulator)
 			default:
 				break;
 		}
+		break;
+	case 0xF000:
+		switch (emulator->opcode & 0x00FF)
+		{
+			case 0x0007:
+				emulator->gpr[(emulator->opcode & 0x0F00) >> 8] = emulator->delay_timer;
+				break;
+
+			case 0x0015:
+				emulator->delay_timer = emulator->gpr[(emulator->opcode & 0x0F00) >> 8] ;
+				break;
+
+			case 0x0018:
+				emulator->sound_timer = emulator->gpr[(emulator->opcode & 0x0F00) >> 8] ;
+				break;
+
+			case 0x001E:
+				emulator->I += emulator->gpr[(emulator->opcode & 0x0F00) >> 8];
+				if(emulator->I > 1000) emulator->I = 1;
+				break;
+
+			case 0x000A:
+				emulator->PC -= 2;
+				if(gfx_event_waiting())
+				{
+					emulator->PC += 2;
+					char c = convert_key(gfx_wait());
+					emulator->gpr[(emulator->opcode & 0x0F00) >> 8] = c;
+
+				}
+				break;
+
+			case 0x0029:
+				emulator->I = emulator->gpr[(emulator->opcode & 0x0F00) >> 8];
+				break;
+
+			case 0x0033:
+				emulator->ram[emulator->I] = emulator->gpr[(emulator->opcode & 0x0F00) >> 8] / 100;
+				emulator->ram[emulator->I+1] = (emulator->gpr[(emulator->opcode & 0x0F00) >> 8] / 10) % 10;
+				emulator->ram[emulator->I+2] = (emulator->gpr[(emulator->opcode & 0x0F00) >> 8] % 100) %10;
+				break;
+
+			case 0x0055:
+				for(int i=0; i <= (emulator->opcode & 0x0F00) >> 8 ; i++)
+				{
+					emulator->ram[emulator->I+i] = emulator->gpr[i];
+				}
+				break;
+
+			case 0x0065:
+				for(int i=0; i <= (emulator->opcode & 0x0F00) >> 8 ; i++)
+				{
+					emulator->gpr[i] = emulator->ram[emulator->I+i];
+				}
+				break;
+
+
+			default:
+				break;
+		}
+
 		break;
 		
 	default:
