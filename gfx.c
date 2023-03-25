@@ -236,10 +236,54 @@ int gfx_ysize()
 	return saved_ysize;
 }
 
+//Added later not included in original gfx
 
 /*Return pixel value in 24 bits */
 int get_pixel(int x,int y)
 {
 	gfx_image = XGetImage(gfx_display,gfx_window,x,y,1,1,AllPlanes,XYPixmap);
     return XGetPixel(gfx_image,0,0);
+}
+
+int convert_key(int key_value)
+{
+	switch (key_value)
+	{
+		case '1':
+			return 1;
+		case '2':
+			return 2;
+		case '3':
+			return 3;
+		case '4':
+			return 0xC;
+		case 'q':
+			return 4;
+		case 'w':
+			return 5;
+		case 'e':
+			return 6;
+		case 'r':
+			return 0xD;
+		case 'a':
+			return 7;
+		case 's':
+			return 8;
+		case 'd':
+			return 9;
+		case 'f':
+			return 0xE;
+		case 'z':
+			return 0xA;
+		case 'x':
+			return 0;
+		case 'c':
+			return 0xB;
+		case 'v':
+			return 0xF;
+		default:
+			return -1;
+			break;
+	
+	}
 }
