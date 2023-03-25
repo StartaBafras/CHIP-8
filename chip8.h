@@ -23,6 +23,8 @@ typedef struct chip8
 	unsigned short int PC:12; // Program caunter
 	unsigned short int I; // Index register 
     unsigned short int opcode; // Opcode
+    unsigned char delay_timer;
+    unsigned char sound_timer;
 	unsigned char gpr[REGISTERS]; // General purpose register
 	unsigned char ram[4096];
     unsigned char screen[SCREEN_Y][SCREEN_X];
