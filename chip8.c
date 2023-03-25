@@ -40,6 +40,8 @@ chip8 *chip8_init()
 	emulator->I = 0;
 	emulator->PC = 0x200;
 	emulator->opcode = 0;
+	emulator->delay_timer = 0;
+	emulator->sound_timer = 0;
 
 	emulator->chip_stack = stack_generator();
 
@@ -50,7 +52,7 @@ chip8 *chip8_init()
 
 int read_rom(chip8 *emulator)
 {
-	FILE *file = fopen("rom.ch8", "r");
+	FILE *file = fopen("test_opcode.ch8", "r");
 
 	while (!feof(file))
 	{
@@ -269,11 +271,38 @@ void decode_execute(chip8 *emulator)
 
 		}
 
-
-
-
 		break;
+		
+	case 0xE000:
+		switch (emulator->opcode & 0x00FF)
+		{
+			case 0x009E:
+				if(gfx_event_waiting())
+				{
+					char c = convert_key(gfx_wait());
+					if(c == emulator->gpr[emulator->opcode & 0x00FF >> 8])
+					{
+						emulator->PC += 4;
+					}
+				}
+				break;
+			
+			case 0x00A1:
+				if(gfx_event_waiting())
+				{
+					char c = convert_key(gfx_wait());
+					if(c != emulator->gpr[emulator->opcode & 0x00FF >> 8])
+					{
+						emulator->PC += 4;
+					}
+				}
+				break;
 
+			default:
+				break;
+		}
+		break;
+		
 	default:
 		break;
 	}
