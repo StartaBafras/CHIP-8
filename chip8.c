@@ -393,3 +393,18 @@ stack *stack_generator()
 
 	return new_stack;
 }
+
+int msleep(long milisec)
+{
+    struct timespec ts;
+
+    if (milisec < 0) return -1;
+
+
+    ts.tv_sec = milisec / 1000;
+    ts.tv_nsec = (milisec % 1000) * 1000000;
+    
+    nanosleep(&ts, &ts);
+
+    return 0;
+}
