@@ -31,7 +31,7 @@ chip8 *chip8_init()
 			0xF0, 0x80, 0xF0, 0x80, 0x80  // F
 		};
 
-	memcpy(&(emulator->ram[0x50]), fonts, 80);
+	memcpy(&(emulator->ram[0]), fonts, 80);
 
 	for (int i = 0; i < REGISTERS; i++)
 	{
@@ -52,7 +52,7 @@ chip8 *chip8_init()
 
 int read_rom(chip8 *emulator)
 {
-	FILE *file = fopen("Zero Demo [zeroZshadow, 2007].ch8", "r");
+	FILE *file = fopen("Keypad Test [Hap, 2006].ch8", "r");
 
 	while (!feof(file))
 	{
@@ -105,6 +105,14 @@ void decode_execute(chip8 *emulator)
 		{
 		case 0x00E0:
 			gfx_clear();
+			for(int i=0; i<SCREEN_Y; i++)
+			{
+				for(int j=0; j<SCREEN_X; j++)
+				{
+					emulator->screen[i][j] = 0;
+				}
+			}
+			
 			break;
 
 		case 0x00EE:
@@ -179,10 +187,10 @@ void decode_execute(chip8 *emulator)
 				{
 					emulator->gpr[0xF] = 1;
 				}
-				else emulator->gpr[0xF] = 1;
-
+				else emulator->gpr[0xF] = 0;
 
 				emulator->gpr[(emulator->opcode & 0x0F00) >> 8] += emulator->gpr[(emulator->opcode & 0x00F0) >> 4];
+
 				break;
 
 			case 0x0005:
@@ -190,9 +198,10 @@ void decode_execute(chip8 *emulator)
 				break;
 
 			case 0x0006: // Kontrol eklenecek
-				emulator->gpr[(emulator->opcode & 0x0F00) >> 8] = emulator->gpr[(emulator->opcode & 0x00F0) >> 4];
+				//emulator->gpr[(emulator->opcode & 0x0F00) >> 8] = emulator->gpr[(emulator->opcode & 0x00F0) >> 4];
+				emulator->gpr[0xF] = emulator->gpr[(emulator->opcode & 0x0F00) >> 8] & 0x0001;
 				emulator->gpr[(emulator->opcode & 0x0F00) >> 8] = emulator->gpr[(emulator->opcode & 0x0F00) >> 8] >> 1;
-				emulator->gpr[0xF] = emulator->gpr[(emulator->opcode & 0x0F00) >> 8] & 0x0002;
+
 				break;
 
 			case 0x0007:
@@ -200,9 +209,10 @@ void decode_execute(chip8 *emulator)
 				break;
 			
 			case 0x000E: // Kontrol eklenecek
-				emulator->gpr[(emulator->opcode & 0x0F00) >> 8] = emulator->gpr[(emulator->opcode & 0x00F0) >> 4];
+				//emulator->gpr[(emulator->opcode & 0x0F00) >> 8] = emulator->gpr[(emulator->opcode & 0x00F0) >> 4];	
+				emulator->gpr[0xF] = emulator->gpr[(emulator->opcode & 0x0F00) >> 8] & 0x80;
 				emulator->gpr[(emulator->opcode & 0x0F00) >> 8] = emulator->gpr[(emulator->opcode & 0x0F00) >> 8] << 1;
-				emulator->gpr[0xF] = emulator->gpr[(emulator->opcode & 0x0F00) >> 8] & 0x0002;
+				
 				break;
 
 			default:
@@ -223,7 +233,7 @@ void decode_execute(chip8 *emulator)
 		break;
 	
 	case 0xB000:
-		emulator->I = (emulator->opcode & 0x0FFF) + emulator->gpr[0];
+		emulator->PC = (emulator->opcode & 0x0FFF) + emulator->gpr[0];
 		break;
 
 	case 0xC000:
@@ -235,8 +245,8 @@ void decode_execute(chip8 *emulator)
 		unsigned short int x, y, height;
 		unsigned char sprite;
 
-		x = (emulator->gpr[(emulator->opcode & 0x0F00) >> 8]);
-		y = (emulator->gpr[(emulator->opcode & 0x00F0) >> 4]);
+		x = (emulator->gpr[(emulator->opcode & 0x0F00) >> 8]) % 64;
+		y = (emulator->gpr[(emulator->opcode & 0x00F0) >> 4]) % 32;
 		height = emulator->opcode & 0x000F;
 		sprite = emulator->ram[emulator->I];
 		emulator->gpr[0xF] = 0;
@@ -253,6 +263,7 @@ void decode_execute(chip8 *emulator)
 					{
 						gfx_color(0, 0, 0);
 						Nearest_neighbor_interpolation(ZOOM_RATE, x, y);
+						gfx_flush();
 						emulator->gpr[0xF] = 1;
 						emulator->screen[y][x] = 0;
 					}
@@ -260,14 +271,15 @@ void decode_execute(chip8 *emulator)
 					{
 						gfx_color(255, 255, 255);
 						Nearest_neighbor_interpolation(ZOOM_RATE, x, y);
+						gfx_flush();
 						emulator->screen[y][x] = 1;
 					}
 				}
-				x++;
+				x = (x+1) % 64;
 			}
 
 			x = (emulator->gpr[(emulator->opcode & 0x0F00) >> 8]) % 64;
-			y++;
+			y = (y+1) % 32;
 
 		}
 
@@ -282,7 +294,7 @@ void decode_execute(chip8 *emulator)
 					char c = convert_key(gfx_wait());
 					if(c == emulator->gpr[(emulator->opcode & 0x0F00) >> 8])
 					{
-						emulator->PC += 4;
+						emulator->PC += 2;
 					}
 				}
 				break;
@@ -293,7 +305,7 @@ void decode_execute(chip8 *emulator)
 					char c = convert_key(gfx_wait());
 					if(c != emulator->gpr[(emulator->opcode & 0x0F00) >> 8])
 					{
-						emulator->PC += 4;
+						emulator->PC += 2;
 					}
 				}
 				break;
@@ -319,7 +331,7 @@ void decode_execute(chip8 *emulator)
 
 			case 0x001E:
 				emulator->I += emulator->gpr[(emulator->opcode & 0x0F00) >> 8];
-				if(emulator->I > 1000) emulator->I = 1;
+				//if(emulator->I > 1000) emulator->I = 1;
 				break;
 
 			case 0x000A:
@@ -334,7 +346,7 @@ void decode_execute(chip8 *emulator)
 				break;
 
 			case 0x0029:
-				emulator->I = emulator->gpr[(emulator->opcode & 0x0F00) >> 8];
+				emulator->I = emulator->gpr[(emulator->opcode & 0x0F00) >> 8] * 5;
 				break;
 
 			case 0x0033:
