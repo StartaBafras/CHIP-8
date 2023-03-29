@@ -46,7 +46,12 @@ int gfx_event_waiting();
 /* Flush all previous output to the window. */
 void gfx_flush();
 
+
+//Added later not included in original gfx
+
 /*Return pixel value in 24 bits */
 int get_pixel(int x,int y);
+
+int convert_key(int key_value);
 
 #endif
