@@ -99,27 +99,29 @@ void decode_execute(chip8 *emulator)
 {
 	switch (emulator->opcode & 0xF000)
 	{
-	case 0x0000: // 00E0 Ekranı temizle
+	case 0x0000: 
 
 		switch (emulator->opcode & 0x00FF)
 		{
-		case 0x00E0:
-			gfx_clear();
-			for(int i=0; i<SCREEN_Y; i++)
-			{
-				for(int j=0; j<SCREEN_X; j++)
+			case 0x00E0: // 00E0 Ekranı temizle
+				gfx_clear();
+				for(int i=0; i<SCREEN_Y; i++)
 				{
-					emulator->screen[i][j] = 0;
+					for(int j=0; j<SCREEN_X; j++)
+					{
+						emulator->screen[i][j] = 0;
+					}
 				}
-			}
-			
-			break;
+				
+				break;
 
-		case 0x00EE:
-			emulator->PC = 0X0FFF & emulator->chip_stack->pop(emulator->chip_stack);
+			case 0x00EE: // 00EE Altrutinler, yığında sırada bulunulan adrese atla
+				emulator->PC = 0X0FFF & emulator->chip_stack->pop(emulator->chip_stack);
+				break;
 
-		default:
-			break;
+			default:
+				printf("Hatalı buyruk \n");
+				break;
 		}
 
 		break;
@@ -166,23 +168,23 @@ void decode_execute(chip8 *emulator)
 
 		switch (emulator->opcode & 0x000F)
 		{
-			case 0x0000:
+			case 0x0000: // 8XY0 VX, VY değerine atanır
 				emulator->gpr[(emulator->opcode & 0x0F00) >> 8] = emulator->gpr[(emulator->opcode & 0x00F0) >> 4];
 				break;
 
-			case 0x0001:
+			case 0x0001: // 8XY1 VX, VX or VY sonucuna atanır
 				emulator->gpr[(emulator->opcode & 0x0F00) >> 8] |= emulator->gpr[(emulator->opcode & 0x00F0) >> 4];
 				break;
 
-			case 0x0002:
+			case 0x0002: // 8XY2 VX, VX and VY sonucuna atanır
 				emulator->gpr[(emulator->opcode & 0x0F00) >> 8] &= emulator->gpr[(emulator->opcode & 0x00F0) >> 4];
 				break;
 
-			case 0x0003:
+			case 0x0003: // 8XY3 VX, VX xor VY sonucuna atanır
 				emulator->gpr[(emulator->opcode & 0x0F00) >> 8] ^= emulator->gpr[(emulator->opcode & 0x00F0) >> 4];
 				break;
 
-			case 0x0004:
+			case 0x0004: // 8XY4 VX, VX + VY sonucuna atanır
 				if(emulator->gpr[(emulator->opcode & 0x0F00) >> 8] + emulator->gpr[(emulator->opcode & 0x00F0) >> 4] > 255)
 				{
 					emulator->gpr[0xF] = 1;
@@ -193,29 +195,30 @@ void decode_execute(chip8 *emulator)
 
 				break;
 
-			case 0x0005:
+			case 0x0005: // 8XY5 VX, VX - VY sonucuna atanır
 				emulator->gpr[(emulator->opcode & 0x0F00) >> 8] -= emulator->gpr[(emulator->opcode & 0x00F0) >> 4];
 				break;
 
-			case 0x0006: // Kontrol eklenecek
+			case 0x0006: // Kontrol eklenecek 8XY6 VX, 1 bit sağa kaydırılır ve kaydırılan (kaybloan) bitin değeri kayıt edilir
 				//emulator->gpr[(emulator->opcode & 0x0F00) >> 8] = emulator->gpr[(emulator->opcode & 0x00F0) >> 4];
 				emulator->gpr[0xF] = emulator->gpr[(emulator->opcode & 0x0F00) >> 8] & 0x0001;
 				emulator->gpr[(emulator->opcode & 0x0F00) >> 8] = emulator->gpr[(emulator->opcode & 0x0F00) >> 8] >> 1;
 
 				break;
 
-			case 0x0007:
+			case 0x0007: // 8XY7 VX, VY - VX sonucuna atanır
 				emulator->gpr[(emulator->opcode & 0x0F00) >> 8] = emulator->gpr[(emulator->opcode & 0x00F0) >> 4] - emulator->gpr[(emulator->opcode & 0x0F00) >> 8];
 				break;
 			
-			case 0x000E: // Kontrol eklenecek
-				//emulator->gpr[(emulator->opcode & 0x0F00) >> 8] = emulator->gpr[(emulator->opcode & 0x00F0) >> 4];	
+			case 0x000E: // Kontrol eklenecek 8XYE VX, 1 bit sola kaydırılır ve kaydırılan (kaybloan) bitin değeri kayıt edilir
+				//emulator->gpr[(emulator->opcode & 0x0F00) >> 8] = emulator->gpr[(emulator->opcode & 0x00F0) >> 4];
 				emulator->gpr[0xF] = emulator->gpr[(emulator->opcode & 0x0F00) >> 8] & 0x80;
 				emulator->gpr[(emulator->opcode & 0x0F00) >> 8] = emulator->gpr[(emulator->opcode & 0x0F00) >> 8] << 1;
 				
 				break;
 
 			default:
+				printf("Hatalı buyruk\n");
 				break;
 		}
 	
@@ -232,12 +235,12 @@ void decode_execute(chip8 *emulator)
 		emulator->I = emulator->opcode & 0x0FFF;
 		break;
 	
-	case 0xB000:
+	case 0xB000: // BNNN Program sayacı, NNN + 0. yazmaçın değerine atlar
 		emulator->PC = (emulator->opcode & 0x0FFF) + emulator->gpr[0];
 		break;
 
-	case 0xC000:
-		emulator->gpr[(emulator->opcode & 0x0F00) >> 8] = rand() % (emulator->opcode & 0x00FF);
+	case 0xC000: // CXNN 0-NN arasında rastgele bir sayı üretir ve VX yazmacında depolar 
+		emulator->gpr[(emulator->opcode & 0x0F00) >> 8] = (rand() % 255) & (emulator->opcode & 0x00FF);
 		break;
 
 
@@ -288,7 +291,7 @@ void decode_execute(chip8 *emulator)
 	case 0xE000:
 		switch (emulator->opcode & 0x00FF)
 		{
-			case 0x009E:
+			case 0x009E: // EX9E Bir tuşa basılıyorsa ve bu tuş VX'e eşitse 1 buyruk atla
 				if(gfx_event_waiting())
 				{
 					char c = convert_key(gfx_wait());
@@ -299,7 +302,7 @@ void decode_execute(chip8 *emulator)
 				}
 				break;
 			
-			case 0x00A1:
+			case 0x00A1: // EXA1 Bir tuşa basılıyorsa ve bu tuş VX'e eşit değilse 1 buyruk atla
 				if(gfx_event_waiting())
 				{
 					char c = convert_key(gfx_wait());
@@ -308,33 +311,38 @@ void decode_execute(chip8 *emulator)
 						emulator->PC += 2;
 					}
 				}
+				else
+				{
+					emulator->PC += 2;
+				} 
 				break;
 
 			default:
+				printf("Hatalı buyruk\n");
 				break;
 		}
 		break;
 	case 0xF000:
 		switch (emulator->opcode & 0x00FF)
 		{
-			case 0x0007:
+			case 0x0007: // FX07 VX'i gecikme zamanlayıcısının geçerli değerine ayarlar
 				emulator->gpr[(emulator->opcode & 0x0F00) >> 8] = emulator->delay_timer;
 				break;
 
-			case 0x0015:
+			case 0x0015: // FX15 Gecikme zamanlayıcısını VX'teki değere ayarlar
 				emulator->delay_timer = emulator->gpr[(emulator->opcode & 0x0F00) >> 8] ;
 				break;
 
-			case 0x0018:
+			case 0x0018: // FX18 ses zamanlayıcısını VX'teki değere ayarlar
 				emulator->sound_timer = emulator->gpr[(emulator->opcode & 0x0F00) >> 8] ;
 				break;
 
-			case 0x001E:
+			case 0x001E: // FX1E Instructor register değeri ile VX değerini topla
 				emulator->I += emulator->gpr[(emulator->opcode & 0x0F00) >> 8];
 				//if(emulator->I > 1000) emulator->I = 1;
 				break;
 
-			case 0x000A:
+			case 0x000A: // FX0A Bir tuş bekle ve bunu VX'e ekle
 				emulator->PC -= 2;
 				if(gfx_event_waiting())
 				{
@@ -345,24 +353,24 @@ void decode_execute(chip8 *emulator)
 				}
 				break;
 
-			case 0x0029:
+			case 0x0029: // FX29 Instructor register değeri VX içerisinde depolanan karekterin çizilmesi için depolandığı adrese atlatılır
 				emulator->I = emulator->gpr[(emulator->opcode & 0x0F00) >> 8] * 5;
 				break;
 
-			case 0x0033:
+			case 0x0033: // FX33 VX içindeki değeri Instructor yazmacının işaret ettiği yere basamak basamak ondalık sayı olarak depolanır
 				emulator->ram[emulator->I] = emulator->gpr[(emulator->opcode & 0x0F00) >> 8] / 100;
 				emulator->ram[emulator->I+1] = (emulator->gpr[(emulator->opcode & 0x0F00) >> 8] / 10) % 10;
 				emulator->ram[emulator->I+2] = (emulator->gpr[(emulator->opcode & 0x0F00) >> 8] % 100) %10;
 				break;
 
-			case 0x0055:
+			case 0x0055: // FX33 0'dan X'e kadar olan sayıdaki yazmaçları ardaşık olarak ram üzerine yazar
 				for(int i=0; i <= (emulator->opcode & 0x0F00) >> 8 ; i++)
 				{
 					emulator->ram[emulator->I+i] = emulator->gpr[i];
 				}
 				break;
 
-			case 0x0065:
+			case 0x0065: // FX65 0'dan X'e kadar olan sayıdaki yazmaçları ardaşık ram üzerindeki bilgileri kayıt eder
 				for(int i=0; i <= (emulator->opcode & 0x0F00) >> 8 ; i++)
 				{
 					emulator->gpr[i] = emulator->ram[emulator->I+i];
@@ -371,12 +379,14 @@ void decode_execute(chip8 *emulator)
 
 
 			default:
+				printf("Hatalı buyruk\n");
 				break;
 		}
 
 		break;
 		
 	default:
+		printf("Hatalı buyruk\n");
 		break;
 	}
 }
@@ -406,15 +416,15 @@ stack *stack_generator()
 	return new_stack;
 }
 
-int msleep(long milisec)
+int microsleep(long microsec)
 {
     struct timespec ts;
 
-    if (milisec < 0) return -1;
+    if (microsec < 0) return -1;
 
 
-    ts.tv_sec = milisec / 1000;
-    ts.tv_nsec = (milisec % 1000) * 1000000;
+    ts.tv_sec = microsec / 1000000;
+    ts.tv_nsec = (microsec % 1000000) * 1000;
     
     nanosleep(&ts, &ts);
 

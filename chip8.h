@@ -49,7 +49,7 @@ short int push(stack *stack_value, short int value);
 
 stack *stack_generator();
 
-int msleep(long milisec);
+int microsleep(long microsec);
 
 
 #endif
