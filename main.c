@@ -15,9 +15,8 @@ int main()
 
 	int ysize = 500;
 	int xsize = 800;
-
-
-
+    unsigned int timer_counter = 0;
+    long seconds,micros;
 
 	gfx_open(xsize,ysize,"Chip-8");
 
@@ -33,25 +32,36 @@ int main()
         fetch(emulator);
         decode_execute(emulator);
         gfx_flush();
-        msleep(1);
+        //microsleep(1);
         //msleep((16,666666667-(micros*1000))); //62.5 Hz
-        gettimeofday(&end, NULL);
-
-        long seconds = (end.tv_sec - start.tv_sec);
-        long micros = ((seconds * 1000000) + end.tv_usec) - (start.tv_usec);
         
-        printf(" %d seconds %d micros\n", seconds, micros);
+
+
+
+    
+        //printf(" %d seconds %d micros\n", seconds, micros);
 
         
-        if(emulator->delay_timer > 0)
+        if(emulator->delay_timer > 0 && timer_counter % 11 == 0)
         {
             emulator->delay_timer--;
         }
-        if(emulator->sound_timer > 0)
+        if(emulator->sound_timer > 0 && timer_counter % 11 == 0)
         {
             printf("\a");
             emulator->sound_timer--;
         }
+
+        timer_counter++;
+        if(timer_counter >= 0xFFFE) timer_counter = 0;
+
+        gettimeofday(&end, NULL);
+
+        seconds = (end.tv_sec - start.tv_sec);
+        micros = ((seconds * 1000000) + end.tv_usec) - (start.tv_usec);
+        
+        microsleep(700-micros);
+
     }
 
 	return 0;
