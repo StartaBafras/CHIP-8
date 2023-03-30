@@ -21,6 +21,7 @@ Yararlanılan çeşitli kaynaklar:
 * https://chip-8.github.io/links/
 * http://chip8emulator.azurewebsites.net/CHIP8.html
 * https://github.com/loktar00/chip8/tree/master/roms
+* https://chipgr8.io/index
 
 ### Derleme Adımları
 
