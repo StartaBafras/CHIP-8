@@ -28,4 +28,4 @@ Yararlanılan çeşitli kaynaklar:
 `make all` ile proje derlenebilir.
 ./chip8 ile çalıştırılabilir.
 
-Proje, geliştirilmeye devam edilmektedir ve hala kritik hatalara sahiptir.
+Proje, geliştirilmeye devam edilmektedir ve çizim buyruğu ile klavye girdileri konusunda hatalara sahiptir.

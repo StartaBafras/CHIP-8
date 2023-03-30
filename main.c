@@ -32,15 +32,6 @@ int main()
         fetch(emulator);
         decode_execute(emulator);
         gfx_flush();
-        //microsleep(1);
-        //msleep((16,666666667-(micros*1000))); //62.5 Hz
-        
-
-
-
-    
-        //printf(" %d seconds %d micros\n", seconds, micros);
-
         
         if(emulator->delay_timer > 0 && timer_counter % 11 == 0)
         {
@@ -60,7 +51,7 @@ int main()
         seconds = (end.tv_sec - start.tv_sec);
         micros = ((seconds * 1000000) + end.tv_usec) - (start.tv_usec);
         
-        microsleep(700-micros);
+        microsleep(1200-micros);
 
     }
 
