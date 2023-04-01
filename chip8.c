@@ -52,7 +52,13 @@ chip8 *chip8_init()
 
 int read_rom(chip8 *emulator)
 {
-	FILE *file = fopen("Keypad Test [Hap, 2006].ch8", "r");
+	FILE *file = fopen("Tetris [Fran Dachille, 1991].ch8", "r");
+
+	if(file == NULL) 
+	{
+		printf("Rom okuma hatası.\n");
+		exit(1);
+	}
 
 	while (!feof(file))
 	{
