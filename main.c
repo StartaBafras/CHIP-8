@@ -33,11 +33,11 @@ int main()
         decode_execute(emulator);
         gfx_flush();
         
-        if(emulator->delay_timer > 0 && timer_counter % 11 == 0)
+        if(emulator->delay_timer > 0 && timer_counter % 20 == 0)
         {
             emulator->delay_timer--;
         }
-        if(emulator->sound_timer > 0 && timer_counter % 11 == 0)
+        if(emulator->sound_timer > 0 && timer_counter % 20 == 0)
         {
             printf("\a");
             emulator->sound_timer--;
@@ -45,6 +45,7 @@ int main()
 
         timer_counter++;
         if(timer_counter >= 0xFFFE) timer_counter = 0;
+
 
         gettimeofday(&end, NULL);
 
