@@ -6,7 +6,10 @@
 #include <time.h>
 #include <stdlib.h>
 
-
+/**
+ * @brief Öykünücü için gerekli alanları ayırır, yazmaç ve ram üzerindeki ilk değerleri ayarlar.
+ * 
+ */
 chip8 *chip8_init()
 {
 	chip8 *emulator = malloc(sizeof(chip8));
@@ -50,6 +53,11 @@ chip8 *chip8_init()
 	return emulator;
 }
 
+/**
+ * @brief Dosya sisteminde bulunan romu okur ve öykünücünün belleğine yazar.
+ * @param emulator Öykünücünün adresi
+ * 
+ */
 int read_rom(chip8 *emulator)
 {
 	FILE *file = fopen("Tetris [Fran Dachille, 1991].ch8", "r");
@@ -71,6 +79,11 @@ int read_rom(chip8 *emulator)
 	return 0;
 }
 
+/**
+ * @brief Öykünücünün belleğine erişip yeni buyruğu çeker ve program sayacını yeni buyruğa ayarlar.
+ * @param emulator Öykünücünün adresi
+ * 
+ */
 int fetch(chip8 *emulator)
 {
 
@@ -80,6 +93,12 @@ int fetch(chip8 *emulator)
 	return 0;
 }
 
+/**
+ * @brief Ekrana çizilecek pikselleri en yakın komşu entarpolasyonu yöntemiyle büyütür ve çizer.
+ * @param zoom_rate Büyütme oranı
+ * @param x Çizilecek pikselin X eksenindeki konumu
+ * @param y Çizilecek pikselin Y eksenindeki konumu
+ */
 int Nearest_neighbor_interpolation(int zoom_rate, int x, int y) // Nearest-neighbor interpolation
 {
 	for (int i = 0; i < zoom_rate; i++)
@@ -101,6 +120,11 @@ int Nearest_neighbor_interpolation(int zoom_rate, int x, int y) // Nearest-neigh
 	return 0;
 }
 
+/**
+ * @brief Buyruğu çözümler ve tespitini yaptıktan sonra çalıştırır.
+ * @param emulator Öykünücünün adresi
+ * 
+ */
 void decode_execute(chip8 *emulator)
 {
 	switch (emulator->opcode & 0xF000)
@@ -397,6 +421,11 @@ void decode_execute(chip8 *emulator)
 	}
 }
 
+/**
+ * @brief Yığın veri tipindeki yapıdan en üstteki değeri alır.
+ * @param stack_value Yığının adresi
+ * 
+ */
 short int pop(stack *stack_value)
 {
 	short int value = stack_value->stack[stack_value->stack_level];
@@ -405,6 +434,11 @@ short int pop(stack *stack_value)
 	return value;
 }
 
+/**
+ * @brief Yığın veri tipindeki yapıya değer depolar.
+ * @param stack_value Yığının adresi
+ * @param value Depolanacak olan değer
+ */
 short int push(stack *stack_value, short int value)
 {
 	stack_value->stack_level++;
@@ -412,7 +446,11 @@ short int push(stack *stack_value, short int value)
 	return 0;
 }
 
-stack *stack_generator()
+/**
+ * @brief Yığın veri tipini bellekten ayırır, gerekli fonksiyonların adreslerini içine gömer ve adresini döndürür
+ * 
+ */
+stack *stack_generator(void)
 {
 	stack *new_stack = malloc(sizeof(stack));
 	new_stack->pop = &pop;
@@ -422,6 +460,11 @@ stack *stack_generator()
 	return new_stack;
 }
 
+/**
+ * @brief Mikrosaniye cinsinden sistemi belli bir süre uyutur.
+ * @param microsec Mikrosaniye
+ * 
+ */
 int microsleep(long microsec)
 {
     struct timespec ts;
