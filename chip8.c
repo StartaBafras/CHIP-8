@@ -322,29 +322,38 @@ void decode_execute(chip8 *emulator)
 		switch (emulator->opcode & 0x00FF)
 		{
 			case 0x009E: // EX9E Bir tuşa basılıyorsa ve bu tuş VX'e eşitse 1 buyruk atla
-				if(gfx_event_waiting())
+				char c = -1;
+				if(check_queue())
 				{
-					char c = convert_key(gfx_wait());
-					if(c == emulator->gpr[(emulator->opcode & 0x0F00) >> 8])
-					{
-						emulator->PC += 2;
-					}
+					c = convert_key(get_key());
 				}
+									
+				if(c == emulator->gpr[(emulator->opcode & 0x0F00) >> 8])
+				{
+					emulator->PC += 2;
+					remove_event();
+				}
+
+
 				break;
 			
 			case 0x00A1: // EXA1 Bir tuşa basılıyorsa ve bu tuş VX'e eşit değilse 1 buyruk atla
-				if(gfx_event_waiting())
+				c = -1;
+				if(check_queue())
 				{
-					char c = convert_key(gfx_wait());
-					if(c != emulator->gpr[(emulator->opcode & 0x0F00) >> 8])
-					{
-						emulator->PC += 2;
-					}
+					c = convert_key(get_key());
 				}
-				else
+
+				if(c != emulator->gpr[(emulator->opcode & 0x0F00) >> 8])
 				{
 					emulator->PC += 2;
-				} 
+				}
+
+				else
+				{
+					remove_event();
+				}
+
 				break;
 
 			default:

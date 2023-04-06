@@ -54,4 +54,12 @@ int get_pixel(int x,int y);
 
 int convert_key(int key_value);
 
+int check_queue();
+
+int remove_event();
+
+int get_key();
+
+
+
 #endif

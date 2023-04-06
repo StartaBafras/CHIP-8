@@ -287,3 +287,44 @@ int convert_key(int key_value)
 	
 	}
 }
+
+
+int get_key()
+{
+	XEvent event;
+	XPeekEvent(gfx_display,&event);
+
+	if(event.type==KeyPress) 
+	{
+		saved_xpos = event.xkey.x;
+		saved_ypos = event.xkey.y;
+
+		/* If the key sequence maps to an ascii character, return that. */
+		KeySym symbol;
+		char str[4];
+		int r = XLookupString(&event.xkey,str,sizeof(str),&symbol,0);
+		if(r==1) return str[0];
+
+		/* Special case for navigation keys, return codes above 129. */
+		if(symbol>=0xff50 && symbol<=0xff58) 
+		{
+			return 129 + (symbol-0xff50);
+		}
+
+	}
+	
+	return -1;
+}
+
+int check_queue()
+{
+	return XPending(gfx_display);
+}
+
+int remove_event()
+{
+	XEvent event;
+	if(XPending(gfx_display))
+		XNextEvent(gfx_display, &event);
+
+}
