@@ -28,6 +28,7 @@ typedef struct chip8
 	unsigned char gpr[REGISTERS]; // General purpose register
 	unsigned char ram[4096];
     unsigned char screen[SCREEN_Y][SCREEN_X];
+    char keyboard_input;
 	stack *chip_stack;
 
 }chip8;

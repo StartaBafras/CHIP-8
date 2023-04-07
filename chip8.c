@@ -45,6 +45,7 @@ chip8 *chip8_init()
 	emulator->opcode = 0;
 	emulator->delay_timer = 0;
 	emulator->sound_timer = 0;
+	emulator->keyboard_input = -1;
 
 	emulator->chip_stack = stack_generator();
 
@@ -322,29 +323,27 @@ void decode_execute(chip8 *emulator)
 		switch (emulator->opcode & 0x00FF)
 		{
 			case 0x009E: // EX9E Bir tuşa basılıyorsa ve bu tuş VX'e eşitse 1 buyruk atla
-				char c = -1;
-				if(check_queue())
+				if(gfx_event_waiting())
 				{
-					c = convert_key(get_key());
+					emulator->keyboard_input = convert_key(get_key());
 				}
 									
-				if(c == emulator->gpr[(emulator->opcode & 0x0F00) >> 8])
+				if(emulator->keyboard_input == emulator->gpr[(emulator->opcode & 0x0F00) >> 8])
 				{
 					emulator->PC += 2;
 					remove_event();
 				}
 
-
+				emulator->keyboard_input = -1;
 				break;
 			
 			case 0x00A1: // EXA1 Bir tuşa basılıyorsa ve bu tuş VX'e eşit değilse 1 buyruk atla
-				c = -1;
-				if(check_queue())
+				if(gfx_event_waiting())
 				{
-					c = convert_key(get_key());
+					emulator->keyboard_input = convert_key(get_key());
 				}
 
-				if(c != emulator->gpr[(emulator->opcode & 0x0F00) >> 8])
+				if(emulator->keyboard_input != emulator->gpr[(emulator->opcode & 0x0F00) >> 8])
 				{
 					emulator->PC += 2;
 				}
@@ -354,6 +353,7 @@ void decode_execute(chip8 *emulator)
 					remove_event();
 				}
 
+				emulator->keyboard_input = -1;
 				break;
 
 			default:
