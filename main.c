@@ -46,8 +46,8 @@ int main()
         timer_counter++;
         if(timer_counter >= 0xFFFE) timer_counter = 0;
 
-        gfx_event_waiting();
-
+        //gfx_event_waiting();
+        get_keyboard_event();
 
         gettimeofday(&end, NULL);
 
