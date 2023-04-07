@@ -52,14 +52,20 @@ void gfx_flush();
 /*Return pixel value in 24 bits */
 int get_pixel(int x,int y);
 
+/* Converts keyboard inputs to chip-8 inputs */
 int convert_key(int key_value);
 
+/* Returns the number of events in the event queue. */
 int check_queue();
 
+/* Removes the event that is waiting in the queue. */
 int remove_event();
 
+/* The difference from the gfx_wait function is that itreads events from the Xlib queue without removing them. */
 int get_key();
 
+/*Takes an event from the event queue, allowing only one event to be present in the queue. */
+int get_keyboard_event();
 
 
 #endif

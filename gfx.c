@@ -239,11 +239,14 @@ int gfx_ysize()
 //Added later not included in original gfx
 
 /*Return pixel value in 24 bits */
+
 int get_pixel(int x,int y)
 {
 	gfx_image = XGetImage(gfx_display,gfx_window,x,y,1,1,AllPlanes,XYPixmap);
     return XGetPixel(gfx_image,0,0);
 }
+
+/* Converts keyboard inputs to chip-8 inputs */
 
 int convert_key(int key_value)
 {
@@ -289,6 +292,12 @@ int convert_key(int key_value)
 }
 
 
+/* The difference from the gfx_wait function is that it 
+reads events from the Xlib queue without removing them, 
+and only checks for keyboard input and sends it, without 
+handling any other events.
+*/
+
 int get_key()
 {
 	XEvent event;
@@ -316,15 +325,50 @@ int get_key()
 	return -1;
 }
 
+
+/* Returns the number of events in the event queue. */
+
 int check_queue()
 {
 	return XPending(gfx_display);
 }
 
+
+/* Removes the event that is waiting in the queue. */
 int remove_event()
 {
 	XEvent event;
 	if(XPending(gfx_display))
 		XNextEvent(gfx_display, &event);
+	
+	return 0;
 
+}
+
+/*Takes an event from the event queue, allowing only one event to be present in the queue. 
+If there are more events, it discards them.*/
+int get_keyboard_event()
+{
+	XEvent event;
+
+	while (XEventsQueued(gfx_display, QueuedAlready) > 0) 
+	{
+    	XNextEvent(gfx_display, &event);
+    	if (event.type == KeyPress) 
+		{
+        	if (XEventsQueued(gfx_display, QueuedAlready) > 0) 
+			{
+            	XEvent next_event;
+            	XPeekEvent(gfx_display, &next_event);
+            	if (next_event.type == KeyPress) 
+				{
+                	XNextEvent(gfx_display, &next_event);
+            	}
+        	}
+			else XPutBackEvent(gfx_display, &event);
+        	break;
+    	}
+	}
+
+	return 0;
 }
