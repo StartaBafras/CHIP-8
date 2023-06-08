@@ -1,4 +1,5 @@
 # CHIP-8
+![Ekran Görüntüsü - 2023-06-08 11-35-29](https://github.com/StartaBafras/CHIP-8/assets/30952126/57255ad3-1b65-4af0-a81b-c1a79eeb3998)
 
 ## TR
 
